@@ -4,7 +4,7 @@
   "description": "react scroll handler component",
   "main": "src/ScrollSpy.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "keywords": [
     "react",
@@ -13,6 +13,11 @@
   ],
   "author": "Oliver White (oliver@nuagedelait.com)",
   "license": "MIT",
+  "devDependencies": {
+    "mocha": "^3.3.0",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4"
+  },
   "dependencies": {
     "react": ">= 16.8",
     "prop-types": "^15.5.9"
