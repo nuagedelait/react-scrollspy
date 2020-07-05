@@ -1,14 +1,15 @@
 {
-  "name": "react-scrollspy",
+  "name": "react-scrollhandler",
   "version": "0.1.0",
-  "description": "react scrollspy component",
+  "description": "react scroll handler component",
   "main": "src/ScrollSpy.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "react",
-    "scrollspy"
+    "scroll",
+    "onscroll"
   ],
   "author": "Oliver White (oliver@nuagedelait.com)",
   "license": "MIT",
