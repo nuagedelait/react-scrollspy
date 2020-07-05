@@ -1,4 +1,4 @@
-import Scrollspy from './src/ScrollSpy.js';
+const ScrollSpy = require('./src/ScrollSpy.js');
 var expect = require("expect");
 
 describe("tests", function () {
