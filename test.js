@@ -1,5 +1,5 @@
-const ScrollSpy = require('./src/ScrollSpy.js');
-var expect = require("expect");
+import './src/ScrollSpy.js';
+import expect = from "expect";
 
 describe("tests", function () {
   expect(root).toEqual(1);
