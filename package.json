@@ -3,10 +3,11 @@
   "name": "@nuagedelait/react-scrollspy",
   "version": "0.1.1",
   "description": "react scroll handler component",
-  "main": "src/ScrollSpy.js",
+  "main": "lib/ScrollSpy.js",
   "scripts": {
     "test": "jest",
-    "lint": "eslint ./src"
+    "lint": "eslint ./src",
+    "publish": "babel src --out-dir lib && np"
   },
   "keywords": [
     "react",
@@ -16,10 +17,11 @@
   "author": "Oliver White (oliver@nuagedelait.com)",
   "license": "MIT",
   "devDependencies": {
+    "@babel/cli": "^7.10.4",
+    "@babel/core": "^7.10.4",
+    "@babel/polyfill": "^7.10.4",
     "@babel/preset-env": "^7.10.4",
     "@babel/preset-react": "7.10.4",
-    "babel-jest": "^26.1.0",
-    "babel-polyfill": "^6.26.0",
     "eslint": "^7.4.0",
     "jest": "^26.1.0",
     "react-dom": "^16.13.1",
