@@ -3,7 +3,7 @@ import React from "react";
 import ScrollSpy from '../src/ScrollSpy.js';
 import ReactDOM from 'react-dom';
 import { act } from 'react-dom/test-utils';
-import "babel-polyfill";
+import "@babel/polyfill";
 
 let container;
 beforeEach(() => {
