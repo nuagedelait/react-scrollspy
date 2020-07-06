@@ -1,4 +1,4 @@
-import React,{useEffect,useRef} from 'react';
+import React,{useEffect,useRef,Fragment,useCallback} from 'react';
 import PropTypes from 'prop-types';
 
 const ScrollSpy = (props) => {
@@ -38,12 +38,10 @@ const ScrollSpy = (props) => {
 
   //Triggered while element is in the view
   const whileInView = async (element,deltaX,deltaY) =>{
-
     /*
     Add classes to indicate % of the view ditance
     ex : Vertical values = from bottom inviewY_b_100,inviewY_b_90,... to screen center inviewY_0 to top ...,inviewY_b_90,inviewY_t_100
     */
-
     const top = '_t_';
     const bottom = '_b_';
     const left = '_l_';
@@ -75,56 +73,45 @@ const ScrollSpy = (props) => {
     }
   }
 
-  useEffect(()=>{
-    //Executed each time the target or the source change
+  const onScroll =  useCallback((e) =>{
 
-    //Handle window fallback
-    let scrollSource = source.current;
-    if(scrollSource === undefined || scrollSource === null){
-      scrollSource = window;
-    }
-    //Add the listener
-    scrollSource.addEventListener('scroll',onScroll);
-
-    return(()=>{
-      //On unmount, clear timeouts and remove listener
-      clearTimeout(inTO);
-      clearTimeout(outTO);
-      scrollSource.removeEventListener('scroll',onScroll);
-    })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[domTarget.current,source.current]);
-
-  const onScroll = () =>{
     //The function on scrolling
+
+    let target = domTarget.current;
+
+    if(props.target === 'parent'){
+        target = target.parentNode;
+    }
 
     //view bounds
     const view = {
       width:window.innerWidth,
       height:window.innerHeight
     }
-    //Element bounds
-    const bounds = domTarget.current.getBoundingClientRect();
 
-    if((bounds.y<(view.height-props.offsetY) && bounds.y>(0+props.offsetY)) || props.ignoreY){
+    //Element bounds
+    const bounds = target.getBoundingClientRect();
+
+    if((bounds.top<=(view.height-props.offsetY) && bounds.top>=(0+props.offsetY)) || props.ignoreY){
       //Element is in view verticaly
-      if((bounds.x<(view.width-props.offsetX) && bounds.x>(0+props.offsetX)) || props.ignoreX){
+      if((bounds.left<=(view.width-props.offsetX) && bounds.left>=(0+props.offsetX)) || props.ignoreX){
         //Element is in view horizontaly
 
         //Calculate % of distance from the middle of the screen (-1 to 1) for both axis
         //Calculated only if the axis is not ignored
         let progressX = 0;
         if(!props.ignoreX){
-          progressX = Math.round((bounds.x-view.width/2)/(view.width/2-props.offsetX)*10)/10;
+          progressX = Math.round((bounds.left-view.width/2)/(view.width/2-props.offsetX)*10)/10;
         }
         let progressY = 0;
         if(!props.ignoreY){
-          progressY = Math.round((bounds.y-view.height/2)/(view.height/2-props.offsetY)*10)/10;
+          progressY = Math.round((bounds.top-view.height/2)/(view.height/2-props.offsetY)*10)/10;
         }
         //Execute on scroll functions
         whileInView(domTarget.current,progressX,progressY)
         //Element is in view
         if(status !== 'animate' && status !== 'in'){
+
           //Execute only on enter
           status = 'animate';
           inTO = setTimeout(()=>{enterView(domTarget.current)},props.delayIn);
@@ -145,54 +132,89 @@ const ScrollSpy = (props) => {
         return;
       }
     }
-  }
+  })
 
+  useEffect(()=>{
+    //Executed each time the target or the source change
+
+    //Handle window fallback
+    let scrollSource = source.current;
+    if(scrollSource === undefined || scrollSource === null){
+      scrollSource = window;
+    }
+
+    //Add the listener
+    scrollSource.addEventListener('scroll',onScroll);
+
+    return(()=>{
+      //On unmount, clear timeouts and remove listener
+      clearTimeout(inTO);
+      clearTimeout(outTO);
+      scrollSource.removeEventListener('scroll',onScroll);
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[domTarget.current,source.current]);
+
+  if(!props.children){
+    return(<Fragment/>)
+  }
   //if there's only one child, transform it to an array so we can map in the render
   let children = props.children;
   if(!Array.isArray(props.children)){
     children = [props.children]
   }
 
-  return(
-    <>
+  return(<Fragment>
     {
-      children.map((element,k)=>{
+      children && children.map((element,k)=>{
         if(k===0){
           //First child become the reference
-          const Component = element.type;
-          const props = {
+          const Element = element.type;
+          const elementProps = {
             key:k,
             ref:domTarget,
             ...element.props,
           }
-          return(<Component {...props}/>)
+          return(<Element {...elementProps}/>)
         }else{
           return(element)
         }
       })
     }
-    </>
-  )
+    </Fragment>)
+
+
 };
 
 ScrollSpy.propTypes = {
+  spyid : PropTypes.string,
   offsetX : PropTypes.number,
   offsetY : PropTypes.number,
   delayIn : PropTypes.number,
   delayOut : PropTypes.number,
   animateOnce : PropTypes.bool,
   ignoreX : PropTypes.bool,
-  ignoreY : PropTypes.bool
+  ignoreY : PropTypes.bool,
+  target : (props, propName, componentName) =>{
+    if(props[propName] !== 'parent' && props[propName] instanceof HTMLElement){
+      return new Error(
+        'Invalid prop `' + propName + '` supplied to' +
+        ' `' + componentName + '`. Validation failed.'
+      );
+    }
+  }
 };
 
 ScrollSpy.defaultProps = {
+  spyid : "",
   offsetX :0,
   offsetY : 100,
   delayIn : 0,
   delayOut : 0,
   animateOnce : false,
   ignoreX : true,
-  ignoreY : false
+  ignoreY : false,
+  target:null
 };
 
 export default ScrollSpy;
