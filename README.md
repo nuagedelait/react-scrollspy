@@ -4,6 +4,9 @@ React scrollspy component
 
 This component is under development
 
+#### Roadmap :
+Export dist
+
 ## install
 ```
 npm install @nuagedelait/react-scrollspy --save
