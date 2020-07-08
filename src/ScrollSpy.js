@@ -1,3 +1,5 @@
+//SCROLSPY V1.1.0
+
 import React,{useEffect,useRef,Fragment,useCallback} from 'react';
 import PropTypes from 'prop-types';
 
@@ -14,6 +16,20 @@ const ScrollSpy = (props) => {
   let inTO = null;
   let outTO = null;
 
+  const top = '_t_';
+  const bottom = '_b_';
+  const left = '_l_';
+  const right = '_r_';
+  const indexes = [-100,-90,-80,-70,-60,-50,-40,-30,-20,-10,0,10,20,30,40,50,60,70,80,90,100];
+
+  const cleanClasses = (element) => {
+    //Clean all classes
+    const classesX = indexes.map(index => 'inviewX'+(index > 0 ? right+index : (index === 0 ? '_' : left)+index*-1));
+    element.classList.remove.apply(element.classList,classesX);
+    const classesY = indexes.map(index => 'inviewY'+(index > 0 ? bottom+index : (index === 0 ? '_' : top)+index*-1));
+    element.classList.remove.apply(element.classList,classesY);
+  }
+
   //Triggered when element enter the view
   const enterView = async (element,deltaX,deltaY) =>{
     element.classList.add('inview');
@@ -27,6 +43,14 @@ const ScrollSpy = (props) => {
 
   //Triggered when element leave the view (can be a promise)
   const leaveView = async (element) =>{
+
+    //Clean all progress classes
+    cleanClasses(element);
+
+    //Call whileinview with max delta to prevent speed scroll
+    await whileInView(element,-1,-1);
+
+    //Remove inview class
     element.classList.remove('inview');
 
     //Execute custom function pass as prop
@@ -42,24 +66,17 @@ const ScrollSpy = (props) => {
     Add classes to indicate % of the view ditance
     ex : Vertical values = from bottom inviewY_b_100,inviewY_b_90,... to screen center inviewY_0 to top ...,inviewY_b_90,inviewY_t_100
     */
-    const top = '_t_';
-    const bottom = '_b_';
-    const left = '_l_';
-    const right = '_r_';
+    cleanClasses(element);
 
     //Prepare an oject ot add as attribute
     let attr = {}
 
-    const indexes = [-100,-90,-80,-70,-60,-50,-40,-30,-20,-10,0,10,20,30,40,50,60,70,80,90,100];
     if(!props.ignoreX){
-      const classesX = indexes.map(index => 'inviewX'+(index > 0 ? right+index : (index === 0 ? '_' : left)+index*-1));
-      element.classList.remove.apply(element.classList,classesX);
       element.classList.add('inviewX'+(deltaX < 0 ? right : (deltaX === 0 ? '_' : left)) + (deltaX < 0 ? -deltaX : deltaX)*100);
       attr.deltaX = deltaX;
     }
     if(!props.ignoreY){
-      const classesY = indexes.map(index => 'inviewY'+(index > 0 ? bottom+index : (index === 0 ? '_' : top)+index*-1));
-      element.classList.remove.apply(element.classList,classesY);
+
       element.classList.add('inviewY'+(deltaY < 0 ? top : (deltaY === 0 ? '_' : bottom)) + (deltaY < 0 ? -deltaY : deltaY)*100);
       attr.deltaY = deltaY;
     }
